@@ -75,9 +75,9 @@
     },
     "scripts": {
         "compile": "tsc -p ./",
-        "package": "vsce package -o vscode-sed.vsix --yarn",
+        "package": "vsce package --yarn",
         "postinstall": "node ./node_modules/vscode/bin/install",
-        "release": "vsce publish --packagePath vscode-sed.vsix --yarn",
+        "release": "vsce publish --yarn",
         "watch": "tsc -watch -p ./"
     },
     "devDependencies": {
