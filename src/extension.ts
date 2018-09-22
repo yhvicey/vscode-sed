@@ -2,71 +2,57 @@ import * as vscode from 'vscode';
 import Sed from './sed';
 import Utils from './utils';
 import Config from './config';
+import DocHelper from './docHelper';
 
 export function activate(context: vscode.ExtensionContext) {
-    let executablePath = Utils.getSedExecutable();
+    const executablePath = Utils.getSedExecutable();
     if (!executablePath) {
-        vscode.window.showErrorMessage("No sed executable found, whether specify it in config or add it to you PATH environment variable.");
+        vscode.window.showErrorMessage(
+            "No sed executable found, whether specify it in config or add it to you PATH environment variable."
+        );
         return;
     }
-    let sed = new Sed(executablePath);
+    const sed = new Sed(executablePath);
     console.log('VSCode Sed initialized.');
 
     context.subscriptions.push(
         /**
          * execute sed command
          */
-        vscode.commands.registerCommand('sed.execute', async (...args: any[]) => {
-            args.forEach(arg => {
-                console.log(arg);
-            });
-            let editor = vscode.window.activeTextEditor;
+        vscode.commands.registerCommand('sed.execute', async () => {
+            const editor = vscode.window.activeTextEditor;
             if (!editor) {
                 vscode.window.showWarningMessage("Please open a document first.");
                 return;
             }
-            // Get inputs
-            let document = editor.document;
-            let condition = await vscode.window.showInputBox({
+
+            // Get command
+            const document = editor.document;
+            const command = await vscode.window.showInputBox({
                 ignoreFocusOut: true,
-                placeHolder: "No slash ('/') required",
-                prompt: "Condition (Optional)"
+                placeHolder: "Quote is not required",
+                prompt: "Command"
             });
-            let action = await vscode.window.showInputBox({
-                ignoreFocusOut: true,
-                prompt: "Action"
-            });
-            if (!action) {
-                vscode.window.showErrorMessage("Please provide action.");
-                return;
+            if (command.length === 0) {
+                vscode.window.showErrorMessage("Please provide command.");
             }
-            // Create result file
-            let uri = new vscode.Uri().with({
-                scheme: "untitled",
-                path: "Result"
-            });
-            let processedDocument = await vscode.workspace.openTextDocument(uri);
-            let processedEditor = await vscode.window.showTextDocument(processedDocument);
+
+            // Open result file
+            const uri = vscode.Uri.parse(`untitled:${editor.document.fileName}.result`);
+            const processedDocument = await vscode.workspace.openTextDocument(uri);
+            await vscode.window.showTextDocument(processedDocument);
+
             // Process the text
-            let config = vscode.workspace.getConfiguration('sed') as Config;
-            let batchSize = config.batchSize || 1000;
-            for (let i = 0; i < document.lineCount; i += batchSize) {
-                let end = Math.min(i + batchSize - 1, document.lineCount - 1);
-
-                let startPos = document.lineAt(i).range.start;
-                let endPos = document.lineAt(end).range.end;
-
-                let text = document.getText(new vscode.Range(startPos, endPos));
-                if (text.length === 0) continue;
-                let processedBuffer = sed.execute(text, action, condition);
-                if (!processedBuffer || processedBuffer.length === 0) continue;
-                let processedText = processedBuffer.toString();
+            const config = vscode.workspace.getConfiguration('sed') as Config;
+            const batchSize = config.batchSize || 1000;
+            await DocHelper.foreachBatch(document, batchSize, async text => {
+                if (text.length === 0) { return true; }
+                const processedBuffer = sed.execute(text, command);
+                if (!processedBuffer || processedBuffer.length === 0) { return true; }
+                const processedText = processedBuffer.toString();
                 // Insert into processed document
-                let processedEndPos = processedDocument.lineAt(processedDocument.lineCount - 1).range.end;
-                await processedEditor.edit(edit => {
-                    edit.insert(processedEndPos, processedText);
-                });
-            }
+                return await DocHelper.append(processedDocument, processedText);
+            });
         }),
         /**
          * Show current executable path

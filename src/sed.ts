@@ -9,10 +9,9 @@ export default class Sed {
         this.executablePath = executablePath;
     }
 
-    public execute(text: string, action: string, condition?: string) {
-        const script = this.getScript(action, condition);
+    public execute(text: string, command: string) {
         const config = vscode.workspace.getConfiguration('sed') as Config;
-        const fullArgs = config.options && config.options.concat(script) || [script];
+        const fullArgs = (config.options || []).concat(command);
         // Start sed process
         const cp = child_process.spawnSync(this.executablePath, fullArgs, {
             input: text,
@@ -29,21 +28,6 @@ export default class Sed {
             console.error(cp.error);
         } else {
             return cp.stdout;
-        }
-    }
-
-    private getScript(action: string, condition?: string) {
-        if (condition) {
-            // Normalize condition
-            if (!condition.startsWith('/')) {
-                condition = `/${condition}`;
-            }
-            if (!condition.endsWith('/')) {
-                condition = `${condition}/`;
-            }
-            return `${condition} ${action}`;
-        } else {
-            return action;
         }
     }
 }
