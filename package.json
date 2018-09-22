@@ -6,6 +6,11 @@
     "publisher": "vicey",
     "license": "MIT",
     "repository": "https://github.com/yhvicey/vscode-sed",
+    "icon": "images/gnu.png",
+    "keywords": [
+        "gnu",
+        "sed"
+    ],
     "engines": {
         "vscode": "^1.5.0"
     },
