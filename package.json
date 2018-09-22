@@ -2,7 +2,7 @@
     "name": "vscode-sed",
     "displayName": "Sed",
     "description": "Sed in Visual Studio Code.",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "publisher": "vicey",
     "license": "MIT",
     "repository": "https://github.com/yhvicey/vscode-sed",
