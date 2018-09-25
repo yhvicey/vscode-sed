@@ -20,12 +20,14 @@ export default class Sed {
             maxBuffer: 200 * 1024 + text.length,
             encoding: config.encoding || 'utf-8'
         });
+        if (cp.error) {
+            console.warn(cp.error);
+        }
         if (cp.stderr.length !== 0) {
             vscode.window.showErrorMessage(`sed execution failed. Error message: ${cp.stderr}`);
             console.error(cp.stderr);
-        } else if (cp.error) {
-            console.warn(cp.error);
+        } else {
+            return cp.stdout;
         }
-        return cp.stdout;
     }
 }
