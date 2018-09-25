@@ -13,6 +13,8 @@ export function activate(context: vscode.ExtensionContext) {
         return;
     }
     const sed = new Sed(executablePath);
+    let lastCommand: string | undefined;
+
     console.log('VSCode Sed initialized.');
 
     context.subscriptions.push(
@@ -29,6 +31,7 @@ export function activate(context: vscode.ExtensionContext) {
             // Get command
             const document = editor.document;
             const command = await vscode.window.showInputBox({
+                value: lastCommand,
                 ignoreFocusOut: true,
                 placeHolder: "Quote is not required",
                 prompt: "Command"
@@ -36,6 +39,7 @@ export function activate(context: vscode.ExtensionContext) {
             if (command.length === 0) {
                 vscode.window.showErrorMessage("Please provide command.");
             }
+            lastCommand = command;
 
             // Open result file
             const uri = vscode.Uri.parse(`untitled:${editor.document.fileName}.result`);

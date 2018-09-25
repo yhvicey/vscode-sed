@@ -1,6 +1,6 @@
-import * as child_process from 'child_process';
 import * as vscode from 'vscode';
 import Config from './config';
+import * as spawn from 'cross-spawn';
 
 export default class Sed {
     private executablePath: string;
@@ -13,21 +13,19 @@ export default class Sed {
         const config = vscode.workspace.getConfiguration('sed') as Config;
         const fullArgs = (config.options || []).concat(command);
         // Start sed process
-        const cp = child_process.spawnSync(this.executablePath, fullArgs, {
+        const cp = spawn.sync(this.executablePath, fullArgs, {
             input: text,
             stdio: "pipe",
             timeout: config.timeout || 1000,
-            maxBuffer: text.length,
+            maxBuffer: 200 * 1024 + text.length,
             encoding: config.encoding || 'utf-8'
         });
         if (cp.stderr.length !== 0) {
             vscode.window.showErrorMessage(`sed execution failed. Error message: ${cp.stderr}`);
             console.error(cp.stderr);
         } else if (cp.error) {
-            vscode.window.showErrorMessage(`Failed to execute sed. Please goto github and create an issue for it.`);
-            console.error(cp.error);
-        } else {
-            return cp.stdout;
+            console.warn(cp.error);
         }
+        return cp.stdout;
     }
 }
