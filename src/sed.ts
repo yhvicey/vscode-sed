@@ -1,15 +1,15 @@
 import * as vscode from 'vscode';
 import Config from './config';
 import * as spawn from 'cross-spawn';
+import Utils from './utils';
 
 export default class Sed {
-    private executablePath: string;
+    public static executablePath?: string;
 
-    public constructor(executablePath: string) {
-        this.executablePath = executablePath;
-    }
-
-    public execute(text: string, command: string) {
+    public static execute(text: string, command: string) {
+        if (!this.executablePath) {
+            return;
+        }
         const config = vscode.workspace.getConfiguration('sed') as Config;
         const fullArgs = (config.options || []).concat(command);
         // Start sed process

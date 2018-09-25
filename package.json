@@ -23,16 +23,18 @@
     "main": "./out/extension",
     "contributes": {
         "commands": [{
-                "command": "sed.execute",
-                "title": "Execute",
-                "category": "Sed"
-            },
-            {
-                "command": "sed.showExecutablePath",
-                "title": "Show executable path",
-                "category": "Sed"
-            }
-        ],
+            "command": "sed.execute",
+            "title": "Execute sed command",
+            "category": "Sed"
+        }, {
+            "command": "sed.executeSavedCommand",
+            "title": "Execute saved sed command",
+            "category": "Sed"
+        }, {
+            "command": "sed.showExecutablePath",
+            "title": "Show executable path",
+            "category": "Sed"
+        }],
         "configuration": {
             "type": "object",
             "title": "VSCode Sed Configuration",
@@ -76,6 +78,15 @@
                 "-n"
             ],
             "sed.timeout": 1000
+        },
+        "menus": {
+            "editor/context": [{
+                "command": "sed.execute",
+                "group": "Sed"
+            }, {
+                "command": "sed.executeSavedCommand",
+                "group": "Sed"
+            }]
         }
     },
     "scripts": {

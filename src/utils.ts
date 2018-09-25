@@ -14,27 +14,29 @@ export default class Utils {
      *
      * @returns {(string | null)} Executable path of sed program
      */
-    public static getSedExecutable(): string | undefined {
+    public static getSedExecutablePath(): string | undefined {
         // Find sed in configuration
-        let config = vscode.workspace.getConfiguration("sed") as Config;
+        const config = vscode.workspace.getConfiguration("sed") as Config;
         let executablePath = config.sedPath;
-        if (executablePath && existsSync(executablePath))
+        if (executablePath && existsSync(executablePath)) {
             return executablePath;
+        }
         // Find sed in PATH
         try {
             executablePath = which.sync("sed");
-            if (existsSync(executablePath))
+            if (existsSync(executablePath)) {
                 return executablePath;
-        }
-        catch { /* no-op */ }
+            }
+        } catch { /* no-op */ }
         // Find sed under lib folder
-        let platform = os.platform();
+        const platform = os.platform();
         executablePath = path.join(__dirname, "../lib", platform, "sed");
-        if (platform === 'win32')
+        if (platform === 'win32') {
             executablePath = executablePath + ".exe";
-        if (executablePath && existsSync(executablePath))
+        }
+        if (executablePath && existsSync(executablePath)) {
             return executablePath;
+        }
         return undefined;
     }
-
 }

@@ -5,15 +5,21 @@ import Config from './config';
 import DocHelper from './docHelper';
 
 export function activate(context: vscode.ExtensionContext) {
-    const executablePath = Utils.getSedExecutable();
+    // Init sed
+    const executablePath = Utils.getSedExecutablePath();
     if (!executablePath) {
         vscode.window.showErrorMessage(
             "No sed executable found, whether specify it in config or add it to you PATH environment variable."
         );
         return;
     }
-    const sed = new Sed(executablePath);
+    Sed.executablePath = executablePath;
+
+    // Save some variables
     let lastCommand: string | undefined;
+
+    // Init UI element
+
 
     console.log('VSCode Sed initialized.');
 
@@ -51,12 +57,15 @@ export function activate(context: vscode.ExtensionContext) {
             const batchSize = config.batchSize || 1000;
             await DocHelper.foreachBatch(document, batchSize, async text => {
                 if (text.length === 0) { return true; }
-                const processedBuffer = sed.execute(text, command);
+                const processedBuffer = Sed.execute(text, command);
                 if (!processedBuffer || processedBuffer.length === 0) { return true; }
                 const processedText = processedBuffer.toString();
                 // Insert into processed document
                 return await DocHelper.append(processedDocument, processedText);
             });
+        }),
+        vscode.commands.registerCommand('sed.executeSavedCommand', () => {
+
         }),
         /**
          * Show current executable path
