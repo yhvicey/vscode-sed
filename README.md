@@ -45,7 +45,7 @@ PS> yarn run release --packagePath <package path> --pat <VSTS PAT>
 
 ## TODO
 
-- [ ] Add history support
+- [x] Add history support
 - [ ] Add shortcut in context menu
 - [ ] Save favorite commands
 - [ ] Customize commands showing in the context menu
