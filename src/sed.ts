@@ -1,6 +1,6 @@
-import * as child_process from 'child_process';
 import * as vscode from 'vscode';
 import Config from './config';
+import * as spawn from 'cross-spawn';
 
 export default class Sed {
     private executablePath: string;
@@ -13,7 +13,7 @@ export default class Sed {
         const config = vscode.workspace.getConfiguration('sed') as Config;
         const fullArgs = (config.options || []).concat(command);
         // Start sed process
-        const cp = child_process.spawnSync(this.executablePath, fullArgs, {
+        const cp = spawn.sync(this.executablePath, fullArgs, {
             input: text,
             stdio: "pipe",
             timeout: config.timeout || 1000,
