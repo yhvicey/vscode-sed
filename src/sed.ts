@@ -17,7 +17,7 @@ export default class Sed {
             input: text,
             stdio: "pipe",
             timeout: config.timeout || 1000,
-            maxBuffer: text.length,
+            maxBuffer: 200 * 1024 + text.length,
             encoding: config.encoding || 'utf-8'
         });
         if (cp.stderr.length !== 0) {
