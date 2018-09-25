@@ -24,10 +24,8 @@ export default class Sed {
             vscode.window.showErrorMessage(`sed execution failed. Error message: ${cp.stderr}`);
             console.error(cp.stderr);
         } else if (cp.error) {
-            vscode.window.showErrorMessage(`Failed to execute sed. Please goto github and create an issue for it.`);
-            console.error(cp.error);
-        } else {
-            return cp.stdout;
+            console.warn(cp.error);
         }
+        return cp.stdout;
     }
 }
